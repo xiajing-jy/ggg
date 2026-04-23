@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生日礼物</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background 1s ease;
+            overflow: hidden;
+        }
+        
+        .bg-1 {
+            background: linear-gradient(135deg, #ffeef4 0%, #ffd6e7 100%);
+        }
+        
+        .bg-2 {
+            background: linear-gradient(135deg, #ffd6e7 0%, #ffb6c1 100%);
+        }
+        
+        .bg-3 {
+            background-color: #ffeef4;
+        }
+        
+        .bg-4 {
+            background-color: #ffd6e7;
+        }
+        
+        .bg-5 {
+            background-color: #ffb6c1;
+        }
+        
+        .bg-6 {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e7f5 100%);
+        }
+        
+        .bg-7 {
+            background: linear-gradient(135deg, #f0f8e6 0%, #e0f0d6 100%);
+        }
+        
+        .bg-8 {
+            background: linear-gradient(135deg, #f8f0e6 0%, #f0e0d6 100%);
+        }
+        
+        .main-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            width: 90%;
+            max-width: 400px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(255, 105, 180, 0.3);
+            padding: 25px;
+            text-align: center;
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1000;
+        }
+        
+        .main-modal.active {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+        
+        .main-modal h2 {
+            color: #ff6b9d;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+        
+        .main-modal p {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        
+        .main-modal button {
+            background: linear-gradient(135deg, #ff6b9d 0%, #ff8fab 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 107, 157, 0.4);
+        }
+        
+        .main-modal button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 107, 157, 0.6);
+        }
+        
+        .mini-modal {
+            position: fixed;
+            width: 180px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            opacity: 0;
+            z-index: 999;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .mini-modal.effect-1 {
+            transform: scale(0.8) translateY(-30px);
+            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .mini-modal.effect-2 {
+            transform: scale(0.6) translateX(-50px);
+            transition: all 0.7s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        
+        .mini-modal.effect-3 {
+            transform: scale(0.7) rotate(-10deg);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .mini-modal.active.effect-1 {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+        
+        .mini-modal.active.effect-2 {
+            opacity: 1;
+            transform: scale(1) translateX(0);
+        }
+        
+        .mini-modal.active.effect-3 {
+            opacity: 1;
+            transform: scale(1) rotate(0deg);
+        }
+        
+        .mini-modal.clicked {
+            animation: clickEffect 0.6s ease;
+        }
+        
+        @keyframes clickEffect {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+        
+        .mini-modal-header {
+            padding: 8px 12px;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            font-size: 14px;
+        }
+        
+        .mini-modal-content {
+            padding: 12px;
+            background-color: #fff9fc;
+            color: #666;
+            font-size: 13px;
+            line-height: 1.4;
+            text-align: center;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .text-effect-fadein .mini-modal-content {
+            animation: fadeIn 2s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .heart {
+            position: absolute;
+            font-size: 20px;
+            color: #ff6b9d;
+            pointer-events: none;
+            z-index: 1000;
+            animation: heartFloat 1s ease-out forwards;
+        }
+        
+        @keyframes heartFloat {
+            0% {
+                opacity: 1;
+                transform: translate(0, 0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(0, -50px) scale(1.5);
+            }
+        }
+        
+        .music-control {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 107, 157, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 2000;
+            box-shadow: 0 4px 15px rgba(255, 107, 157, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .music-control:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(255, 107, 157, 0.5);
+        }
+        
+        .music-control.muted {
+            background: rgba(153, 153, 153, 0.7);
+        }
+        
+        .music-icon {
+            font-size: 24px;
+            color: white;
+        }
+        
+        .music-control.muted .music-icon::before {
+            content: "🔇";
+        }
+        
+        .music-control:not(.muted) .music-icon::before {
+            content: "🎵";
+        }
+        
+        .music-control.hidden {
+            display: none;
+        }
+        
+        .copyright {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            color: rgba(0, 0, 0, 0.3);
+            font-size: 12px;
+            z-index: 1000;
+        }
+        
+        .header-color-1 { background-color: #ff6b9d; }
+        .header-color-2 { background-color: #ff8fab; }
+        .header-color-3 { background-color: #ff9ac8; }
+        .header-color-4 { background-color: #ffb6c1; }
+        .header-color-5 { background-color: #ffc2d1; }
+        .header-color-6 { background-color: #a8e6cf; }
+        .header-color-7 { background-color: #b5e8e0; }
+        .header-color-8 { background-color: #c7ceea; }
+        .header-color-9 { background-color: #ffd3b6; }
+        .header-color-10 { background-color: #ffaaa5; }
+        .header-color-11 { background-color: #b8e0d2; }
+        .header-color-12 { background-color: #d4a5a5; }
+        .header-color-13 { background-color: #95b8d1; }
+        .header-color-14 { background-color: #e8d5b7; }
+        .header-color-15 { background-color: #c9cbff; }
+        .header-color-16 { background-color: #ffb7c5; }
+        .header-color-17 { background-color: #a0e7e5; }
+        .header-color-18 { background-color: #b4f8c8; }
+        .header-color-19 { background-color: #fbe7c6; }
+        .header-color-20 { background-color: #ffaebc; }
+        
+        @media (max-width: 768px) {
+            .mini-modal {
+                width: 160px;
+            }
+            
+            .mini-modal-content {
+                font-size: 12px;
+                min-height: 70px;
+                padding: 10px;
+            }
+            
+            .mini-modal-header {
+                padding: 6px 10px;
+                font-size: 13px;
+            }
+            
+            .music-control {
+                top: 15px;
+                right: 15px;
+                width: 45px;
+                height: 45px;
+            }
+            
+            .music-icon {
+                font-size: 20px;
+            }
+        }
+        
+        @keyframes bgChange {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        
+        body.bg-changing {
+            animation: bgChange 1s ease;
+        }
+    </style>
+</head>
+<body class="bg-1">
+    <div id="musicControl" class="music-control hidden">
+        <div class="music-icon"></div>
+    </div>
+    
+    <div class="main-modal" id="mainModal">
+        <h2>生日礼物</h2>
+        <p>您有一份生日礼物，确定要打开吗？</p>
+        <button id="confirmBtn">确定打开</button>
+    </div>
+    
+    <div class="copyright">作者 夏堇 </div>
+
+    <script>
+        function getUrlParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+        
+        const userName = getUrlParam('name') || '';
+        const musicName = getUrlParam('music') || '';
+        
+        const romanticMessages = [
+            "万事如意！",
+            "心想事成！",
+            "前程似锦！",
+            "幸福安康！",
+            "好运连连！",
+            "笑口常开！",
+            "财源广进！",
+            "我会永远陪着你！",
+            "快乐每一天！",
+            "记得早点睡哦",
+            "心愿成真！",
+            "加油！你能行！",
+            "步步高升！",
+            "吉祥如意！",
+            "梦想成真！",
+            "我爱你",
+            "别不开心",
+            "都会好起来的",
+            "没事的，没事的",
+            "你是最棒的",
+            "注意保暖",
+            "做自己就好",
+            "爱人先爱己",
+            "你最好看了",
+            "吃饭了没",
+            "照顾好自己",
+            "多喝水",
+            "记得多笑笑",
+            "想要的都得到",
+            "身体健康",
+            "我爱你",
+            "抱抱你"
+
+        ];
+        
+        const bgClasses = ['bg-1', 'bg-2', 'bg-3', 'bg-4', 'bg-5', 'bg-6', 'bg-7', 'bg-8'];
+        const headerClasses = [
+            'header-color-1', 'header-color-2', 'header-color-3', 
+            'header-color-4', 'header-color-5', 'header-color-6',
+            'header-color-7', 'header-color-8', 'header-color-9',
+            'header-color-10', 'header-color-11', 'header-color-12',
+            'header-color-13', 'header-color-14', 'header-color-15',
+            'header-color-16', 'header-color-17', 'header-color-18',
+            'header-color-19', 'header-color-20'
+        ];
+        
+        let backgroundMusic = null;
+        let isMusicPlaying = false;
+        let isMusicMuted = false;
+        
+        function isMobileDevice() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+                   window.innerWidth <= 768;
+        }
+        
+        let isDragging = false;
+        let dragOffsetX = 0;
+        let dragOffsetY = 0;
+        let currentDragElement = null;
+        
+        window.addEventListener('DOMContentLoaded', function() {
+            const mainModal = document.getElementById('mainModal');
+            const musicControl = document.getElementById('musicControl');
+            const randomBg = bgClasses[Math.floor(Math.random() * bgClasses.length)];
+            document.body.className = randomBg;
+            
+            if (musicName) {
+                musicControl.classList.remove('hidden');
+                loadBackgroundMusic(musicName);
+            }
+            
+            setTimeout(() => {
+                mainModal.classList.add('active');
+            }, 300);
+        });
+        
+        function loadBackgroundMusic(songName) {
+            const apiUrl = `https://api.jkyai.top/API/wyyyjs.php?msg=${encodeURIComponent(songName)}&n=1`;
+            
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.code === 200 && data.data.media.audio_url) {
+                        backgroundMusic = new Audio(data.data.media.audio_url);
+                        backgroundMusic.loop = true;
+                        backgroundMusic.volume = 0.5;
+                        
+                        document.getElementById('confirmBtn').addEventListener('click', function() {
+                            if (backgroundMusic && !isMusicMuted) {
+                                backgroundMusic.play().catch(e => console.log('自动播放被阻止:', e));
+                                isMusicPlaying = true;
+                            }
+                        });
+                        
+                        setupMusicControl();
+                    }
+                })
+                .catch(error => {
+                    console.error('加载音乐失败:', error);
+                    document.getElementById('musicControl').classList.add('hidden');
+                });
+        }
+        
+        function setupMusicControl() {
+            const musicControl = document.getElementById('musicControl');
+            
+            musicControl.addEventListener('click', function() {
+                if (!backgroundMusic) return;
+                
+                if (isMusicMuted) {
+                    backgroundMusic.muted = false;
+                    isMusicMuted = false;
+                    musicControl.classList.remove('muted');
+                    
+                    if (!isMusicPlaying) {
+                        backgroundMusic.play().catch(e => console.log('播放失败:', e));
+                        isMusicPlaying = true;
+                    }
+                } else {
+                    backgroundMusic.muted = true;
+                    isMusicMuted = true;
+                    musicControl.classList.add('muted');
+                }
+            });
+        }
+        
+        document.getElementById('confirmBtn').addEventListener('click', function() {
+            const mainModal = document.getElementById('mainModal');
+            mainModal.classList.remove('active');
+            
+            setTimeout(() => {
+                startMiniModals();
+            }, 500);
+        });
+        
+        function startMiniModals() {
+            let modalCount = 0;
+            const isMobile = isMobileDevice();
+            const maxModals = isMobile ? 100 : 280;
+            
+            const interval = setInterval(() => {
+                if (modalCount >= maxModals) {
+                    clearInterval(interval);
+                    return;
+                }
+                
+                const numToCreate = Math.random() > 0.5 ? 2 : 1;
+                
+                for (let i = 0; i < numToCreate; i++) {
+                    if (modalCount < maxModals) {
+                        createMiniModal(isMobile);
+                        modalCount++;
+                    }
+                }
+            }, 300);
+        }
+        
+        function createMiniModal(isMobile) {
+            const modal = document.createElement('div');
+            modal.className = 'mini-modal';
+            
+            const effectNum = Math.floor(Math.random() * 3) + 1;
+            modal.classList.add(`effect-${effectNum}`);
+            
+            const textEffectRandom = Math.random();
+            if (textEffectRandom < 0.2) {
+                modal.classList.add('text-effect-fadein');
+            }
+            
+            const headerClass = headerClasses[Math.floor(Math.random() * headerClasses.length)];
+            const message = romanticMessages[Math.floor(Math.random() * romanticMessages.length)];
+            const displayMessage = userName ? `${message} ———${userName}` : message;
+            
+            modal.innerHTML = `
+                <div class="mini-modal-header ${headerClass}">💗提示</div>
+                <div class="mini-modal-content">${displayMessage}</div>
+            `;
+            
+            let randomX, randomY;
+            if (isMobile) {
+                const extraMargin = 50;
+                randomX = Math.floor(Math.random() * (window.innerWidth + 2 * extraMargin)) - extraMargin;
+                randomY = Math.floor(Math.random() * (window.innerHeight + 2 * extraMargin)) - extraMargin;
+            } else {
+                const maxX = window.innerWidth - 200;
+                const maxY = window.innerHeight - 150;
+                randomX = Math.max(10, Math.floor(Math.random() * maxX));
+                randomY = Math.max(10, Math.floor(Math.random() * maxY));
+            }
+            
+            modal.style.left = `${randomX}px`;
+            modal.style.top = `${randomY}px`;
+            
+            let rotation = 0;
+            if (Math.random() < 0.3) {
+                rotation = (Math.random() * 10) - 5;
+            }
+            
+            switch(effectNum) {
+                case 1:
+                    modal.style.transform = `scale(0.8) translateY(-30px) rotate(${rotation}deg)`;
+                    break;
+                case 2:
+                    modal.style.transform = `scale(0.6) translateX(-50px) rotate(${rotation}deg)`;
+                    break;
+                case 3:
+                    modal.style.transform = `scale(0.7) rotate(${rotation - 10}deg)`;
+                    break;
+            }
+            
+            document.body.appendChild(modal);
+            
+            addModalInteractions(modal);
+            
+            setTimeout(() => {
+                modal.classList.add('active');
+                modal.style.transform = `scale(1) translate(0) rotate(${rotation}deg)`;
+            }, 50);
+        }
+        
+        function addModalInteractions(modal) {
+            let clickTimer = null;
+            let isDoubleClick = false;
+            
+            modal.addEventListener('click', function(e) {
+                if (isDoubleClick) {
+                    isDoubleClick = false;
+                    return;
+                }
+                
+                if (clickTimer) {
+                    clearTimeout(clickTimer);
+                    clickTimer = null;
+                    isDoubleClick = true;
+                    closeModal(modal);
+                    return;
+                }
+                
+                clickTimer = setTimeout(() => {
+                    clickTimer = null;
+                    modal.classList.add('clicked');
+                    createHeartAnimation(e.clientX, e.clientY);
+                    
+                    setTimeout(() => {
+                        modal.classList.remove('clicked');
+                    }, 600);
+                }, 300);
+            });
+            
+            modal.addEventListener('mousedown', startDrag);
+            modal.addEventListener('touchstart', startDrag);
+            
+            function startDrag(e) {
+                e.preventDefault();
+                isDragging = true;
+                currentDragElement = modal;
+                
+                const rect = modal.getBoundingClientRect();
+                if (e.type === 'mousedown') {
+                    dragOffsetX = e.clientX - rect.left;
+                    dragOffsetY = e.clientY - rect.top;
+                } else {
+                    dragOffsetX = e.touches[0].clientX - rect.left;
+                    dragOffsetY = e.touches[0].clientY - rect.top;
+                }
+                
+                modal.style.transition = 'none';
+                modal.style.zIndex = '1001';
+                
+                document.addEventListener('mousemove', onDrag);
+                document.addEventListener('touchmove', onDrag);
+                document.addEventListener('mouseup', stopDrag);
+                document.addEventListener('touchend', stopDrag);
+            }
+            
+            function onDrag(e) {
+                if (!isDragging || currentDragElement !== modal) return;
+                
+                e.preventDefault();
+                let clientX, clientY;
+                
+                if (e.type === 'mousemove') {
+                    clientX = e.clientX;
+                    clientY = e.clientY;
+                } else {
+                    clientX = e.touches[0].clientX;
+                    clientY = e.touches[0].clientY;
+                }
+                
+                modal.style.left = `${clientX - dragOffsetX}px`;
+                modal.style.top = `${clientY - dragOffsetY}px`;
+            }
+            
+            function stopDrag() {
+                isDragging = false;
+                currentDragElement = null;
+                modal.style.transition = 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                modal.style.zIndex = '999';
+                
+                document.removeEventListener('mousemove', onDrag);
+                document.removeEventListener('touchmove', onDrag);
+                document.removeEventListener('mouseup', stopDrag);
+                document.removeEventListener('touchend', stopDrag);
+            }
+        }
+        
+        function createHeartAnimation(x, y) {
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+            heart.innerHTML = '💗';
+            heart.style.left = `${x - 10}px`;
+            heart.style.top = `${y - 10}px`;
+            
+            document.body.appendChild(heart);
+            
+            setTimeout(() => {
+                heart.remove();
+            }, 1000);
+        }
+        
+        function closeModal(modal) {
+            modal.style.transition = 'all 0.3s ease';
+            modal.style.opacity = '0';
+            modal.style.transform = 'scale(0.5)';
+            
+            setTimeout(() => {
+                if (modal.parentNode) {
+                    modal.parentNode.removeChild(modal);
+                }
+            }, 300);
+        }
+    </script>
+</body>
+</html>
